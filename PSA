@@ -1,0 +1,367 @@
+EXP 1
+
+%% EEEEC18 PSA Practical #1
+%Construction of V curve of Synchronous Generator - For a 3-
+phase
+... Synchronous Generator rated 50 MVA, 0.8 power factor, 11
+kV,
+... operating at 50 Hz with synchronous reactance of 1.21
+ohms, for the
+... rated power of 40 MW with varying excitation from 0.5
+power factor
+... leading to 0.5 power factor lagging, construct V curve in
+steps of 0.1
+... power factor assuming per phase excitation voltage
+E=200xIf, where
+
+... If is the field current, in the operating region of open-
+circuit
+
+... characteristic.
+P = 40; %Active Power Output, MW
+V = 11/sqrt(3) + 1i*0; %Voltage per phase, in kV
+XV = sprintf('%s kV is the per phase voltage.',V);
+disp(XV)
+Zs = 1i*1.21; %Synchronous reactance in ohms
+ang = acos(0.5); %Angle starting from 0.5pf %leading
+theta = ang:-0.1:-ang; %Angle starting from 0.5pf %leading
+to 0.5pf lagging
+P = P*ones(1,length(theta)); %Generating Power %array of
+size that of “theta”
+Iam = P./(3*abs(V)*cos(theta)); %3-phase current, in %kA
+Ia = Iam.*(cos(theta) + 1i*sin(theta)); %current in %Phasor
+Form
+E = V + Zs.*Ia; %KVL applied to equivalent circuit %of
+Synchronous generator
+Em = abs(E); %Excitation voltage magnitude
+If = Em*1000/200; %Field current, in A from the given formula
+plot(If,Iam) %Plotting V-Curve
+grid, xlabel('If - A')
+ylabel('Ia - kA'), text(44, 1, 'Leading pf')
+text(144, 1, 'Lagging pf'), text(90, 0.71, 'Unity pf')
+
+
+EXP 2
+
+
+%% EEEEC18 PSA Practical #2
+%% MATLAB program for Per Unit System
+% Example Three-Phase Transformer
+... Consider, for example, a three-phase two-winding transformer.
+... The following typical parameters could be provided by the
+manufacturer:
+disp('transformer')
+kva_txr = input('Enter the Nominal three-phase Power in kVA: ')
+freq_txr = input('Enter the Nominal frequency in Hz: ')
+% WINDING 1 STAR CONNECTED
+
+8
+
+volt1_txr = input('Enter the WINDING 1 RMS Line-to-line nominal
+voltage in kv')
+resis1_txr = input('Enter the WINDING 1 resistance in pu: ')
+reactance1_txr = input('Enter the WINDING 1 leakage reactance in pu:
+')
+% WINDING 2 DELTA CONNECTED
+volt2_txr = input('Enter the WINDING 2 RMS Line-to-line nominal
+voltage in kv')
+resis2_txr = input('Enter the WINDING 2 resistance in pu: ')
+reactance2_txr = input('Enter the WINDING 2 leakage reactance in pu:
+')
+Rloss = input('Enter the Resistive component for Magnetizing losses
+at nominal voltage in % of nominal current: ')
+Xloss = input('Enter the Inductivee component for Magnetizing losses
+at nominal voltage in % of nominal current: ')
+
+%% The base values for each single-phase transformer are first
+calculated:
+%WINDING 1
+basepwr1_txr = (kva_txr*1e3)/3; %in VA/phase
+basevolt1_txr = (volt1_txr*1e3)/sqrt(3); %in V RMS
+basecurr1_txr = basepwr1_txr/basevolt1_txr; %in A RMS
+baseimp1_txr = basevolt1_txr/basecurr1_txr; %in Ohms
+baseiresis1_txr = basevolt1_txr/basecurr1_txr; %in Ohms
+baseinduc1_txr = baseimp1_txr/(2*pi*freq_txr); %in Henrys
+%WINDING2
+basepwr2_txr = (kva_txr*1e3)/3; %in VA/phase
+basevolt2_txr = (volt2_txr*1e3); %in V RMS
+basecurr2_txr = basepwr2_txr/basevolt2_txr; %in A RMS
+baseimp2_txr = basevolt2_txr/basecurr2_txr; %in Ohms
+baseiresis2_txr = basevolt2_txr/basecurr2_txr; %in Ohms
+baseinduc2_txr = baseimp2_txr/(2*pi*freq_txr); %in Henrys
+%% Actual Values of winding Resistances and Reactances
+R1 = resis1_txr*baseiresis1_txr; L1 = reactance1_txr*baseinduc1_txr;
+R2 = resis2_txr*baseiresis2_txr; L2 = reactance2_txr*baseinduc2_txr;
+%For the magnetizing branch, magnetizing losses of 1% resistive and
+1% inductive mean a magnetizing resistance Rm of 100 pu and a
+magnetizing inductance Lm of 100 pu.
+% Therefore, the values expressed in SI units referred to winding 1
+are
+Rm = Rloss*baseimp1_txr;
+Lm = Xloss*baseinduc1_txr;
+disp('Winding 1 Resistance in Ohms is:')
+disp(R1)
+disp('Ohms')
+
+9
+disp('Winding 2 Resistance in Ohms is:')
+disp(R2)
+disp('Ohms')
+disp('Winding 1 Inductance in Henrys is:')
+disp(L1)
+disp('Henrys')
+disp('Winding 2 Inductance in Henrys is:')
+disp(L2)
+disp('Henrys')
+disp('Magnetizing Resistance in Ohms is:')
+disp(Rm)
+disp('Ohms')
+disp('Magnetizing Inductance in Henrys is:')
+disp(Lm)
+disp('Henrys')
+
+
+EXP 3
+
+%% Power flow between two bus system
+%% Input commands
+E1=input('Source # 1 Voltage Mag. = ');
+delta1=input('Source # 1 Phase Angle = ');
+E2=input('Source # 2 Voltage Mag. = ');
+delta2=input('Source # 2 Phase Angle = ');
+R=input('Line Resistance = ');
+X= input('Line Reactance = ');
+%% Analysis
+Z= R + 1i*X; % line impedance
+delta1 = (-30+delta1:5:30+delta1)'; % change delta1 by +/- 30 deg., col. array
+delta1r = delta1*pi/180; % convert degree to radian
+k=length(delta1);
+delta2=ones(k,1)*delta2; % create col. array of same length for delta2
+delta2r = delta2*pi/180; % convert degree to radian
+V1=E1.*cos(delta1r) + 1i*E1.*sin(delta1r);
+V2=E2.*cos(delta2r) + 1i*E2.*sin(delta2r);
+%% Line current and power calculation
+I12 = (V1 - V2)./Z; I21=-I12;
+S1= V1.*conj(I12);
+P1 = real(S1);
+Q1 = imag(S1);
+
+12
+
+S2= V2.*conj(I21);
+P2 = real(S2);
+Q2 = imag(S2);
+SL= S1+S2;
+PL = real(SL);
+QL = imag(SL);
+Result1=[delta1, P1, P2, PL];
+disp(' Delta 1 P-1 P-2 P-L ')
+disp(Result1)
+figure(1), plot(delta1, P1, delta1, P2, delta1, PL), grid
+text(-26, -550, 'P1'), text(-26, 600,'P2'), text(-26, 100, 'PL')
+xlabel('Source #1 Voltage Phase Angle'), ylabel('P, Watts')
+Result2=[delta1, Q1, Q2, QL];
+disp(' Delta 1 Q-1 Q-2 Q-L ')
+disp(Result2)
+figure(2), plot(delta1, Q1, delta1, Q2, delta1, QL), grid
+text(-26, -550, 'Q1'), text(-26, 600,'Q2'), text(-26, 100, 'QL')
+xlabel('Source #1 Voltage Phase Angle'), ylabel('Q, kVArs')
+
+
+EXP 4
+
+%% EEEEC18 PSA Practical
+V = 20000; Xd = 1.35; Xq = 0.9333;
+theta=acos(0.8);
+Ia = 62.5e06/11000;
+delta = atan(Xq*Ia*cos(theta)/(V + Xq*Ia*sin(theta)));
+deltadg=delta*180/pi;
+E = V*cos(delta)+Xd*Ia*sin(theta+delta);
+E_KV = E/1000; % Excitaiton voltage in kV
+fprintf('Power angle = %g Degree \n', deltadg)
+fprintf('E = %g kV \n\n', E_KV)
+deltadg = (0:.25:180)';
+delta=deltadg*pi/180;
+P=3*E*V/Xd*sin(delta)+3*V^2*(Xd-Xq)/(2*Xd*Xq)*sin(2*delta);
+P = P/1e6; % Power in MW
+plot(deltadg, P), grid
+xlabel('Delta - Degree'), ylabel('P - MW')
+[Pmax, k]=max(P); delmax=deltadg(k);
+fprintf('Max power = %g MW',Pmax)
+fprintf(' at power angle %g degree \n', delmax)
+
+EXP 5
+
+%% Bus Admittance Matrix
+% Develop a function called Y = ybus(zdata) for the formation of the
+bus admittance matrix,
+% zdata is the line data input and contains four columns.
+
+19
+
+% The first two columns are the line bus numbers
+% and the remaining columns contain the line resistance and
+reactance
+% in per unit.
+% The function, ybus shall return the bus admittance matrix.
+% In the program, the line impedances are first converted to
+admittances.
+% Y is then initialized to zero. In the first loop, the line data is
+% searched, and the off-diagonal elements are entered.
+% Finally, in a nested loop, line data is searched to find the
+elements
+% connected to a bus and the diagonal elements are thus formed.
+function[Ybus] = ybus11(zdata)
+nl=zdata(:,1); %from bus
+nr=zdata(:,2); %to bus
+R=zdata(:,3); %line resistance in p.u.
+X=zdata(:,4); %line reactance in p.u.
+nbr=length(zdata(:,1)); %no. of branches in the system
+nbus = max(max(nl), max(nr)); %no. of buses in the system
+Z = R + 1j*X; %branch impedance
+y= ones(nbr,1)./Z; %branch admittance
+Ybus=zeros(nbus,nbus); % initialize Ybus to zero
+for k = 1:nbr % formation of the off diagonal elements
+if nl(k) > 0 && nr(k) > 0
+Ybus(nl(k),nr(k)) = Ybus(nl(k),nr(k)) - y(k);
+Ybus(nr(k),nl(k)) = Ybus(nl(k),nr(k));
+end
+end
+for n = 1:nbus % formation of the diagonal elements
+for k = 1:nbr
+if nl(k) == n || nr(k) == n
+Ybus(n,n) = Ybus(n,n) + y(k);
+else, end
+end
+end
+
+Considering emfs shown in fig. 5.1 as E1 = 1.1 and E2 = 1.0. Use the function Y = ybus(zdata)
+to obtain the bus admittance matrix. Determine the bus impedance matrix by inversion and
+solve for the bus voltages.
+% From To R X
+z = [ 0 1 0 1.0
+0 2 0 0.8
+1 2 0 0.4
+1 3 0 0.2
+2 3 0 0.2
+3 4 0 0.08];
+
+20
+
+[Ybus] = ybus(z) % bus admittance matrix
+Ibus = [-j*1.1; -j*1.25; 0; 0]; % vector of injected bus currents
+Zbus = inv(Ybus) % bus impedance matrix
+Vbus = Zbus*Ibus
+%Vbus = Ybus\Ibus
+
+
+EXP 6
+
+% Gauss-Seidal method
+y12=10-j*20;
+
+23
+
+y13=10-j*30;
+y23=16-j*32;
+y33=y13+y23;
+V1=1.05+j*0;
+format long
+iter =0;
+S2=-4.0-j*2.5;
+P3 = 2;
+V2=1+j*0;
+Vm3=1.04;
+V3=1.04+j*0;
+for I=1:10;
+iter=iter+1
+E2 = V2;
+E3=V3;
+V2 = (conj(S2)/conj(V2)+y12*V1+y23*V3)/(y12+y23)
+DV2 = V2-E2
+Q3 = -imag(conj(V3)*(y33*V3-y13*V1-y23*V2))
+S3 = P3 +j*Q3;
+Vc3 = (conj(S3)/conj(V3)+y13*V1+y23*V2)/(y13+y23)
+Vi3 = imag(Vc3);
+Vr3= sqrt(Vm3^2 - Vi3^2);
+V3 = Vr3 + j*Vi3
+DV3=V3-E3
+end
+format short
+I12=y12*(V1-V2); I21=-I12;
+I13=y13*(V1-V3); I31=-I13;
+I23=y23*(V2-V3); I32=-I23;
+S12=V1*conj(I12); S21=V2*conj(I21);
+S13=V1*conj(I13); S31=V3*conj(I31);
+S23=V2*conj(I23); S32=V3*conj(I32);
+I1221=[I12,I21]
+I1331=[I13,I31]
+I2332=[I23,I32]
+S1221=[S12, S21 (S12+S13) S12+S21]
+S1331=[S13, S31 (S31+S32) S13+S31]
+S2332=[S23, S32 (S23+S21) S23+S32]
+
+EXP 7
+
+
+USE THE SAME CODE AS OF EXP 5 FOR [YBUS] EVALUATION
+% Example 6.10 Newton-Raphson method
+V = [1.05; 1.0; 1.04];
+d = [0; 0; 0]; %Angle of voltages
+Ps = [-4; 2.0];
+Qs = -2.5;
+% From To R X
+z = [ 1 2 0.02 0.04
+2 3 0.012 0.025
+1 3 0.01 0.03
+];
+[YB] = ybus11(z) % bus admittance matrix
+Y = abs(YB); t = angle(YB);
+iter=0;
+pwracur = 0.00025; % Power accuracy
+DC = 10; % Set the maximum power residual to a high value
+%% Newton Raphson
+while max(abs(DC)) > pwracur
+iter = iter +1;
+P=[V(2)*V(1)*Y(2,1)*cos(t(2,1)-d(2)+d(1))+V(2)^2*Y(2,2)*cos(t(2,2))+ ...
+V(2)*V(3)*Y(2,3)*cos(t(2,3)-d(2)+d(3));
+V(3)*V(1)*Y(3,1)*cos(t(3,1)-d(3)+d(1))+V(3)^2*Y(3,3)*cos(t(3,3))+ ...
+V(3)*V(2)*Y(3,2)*cos(t(3,2)-d(3)+d(2))];
+Q= -V(2)*V(1)*Y(2,1)*sin(t(2,1)-d(2)+d(1))-V(2)^2*Y(2,2)*sin(t(2,2))- ...
+V(2)*V(3)*Y(2,3)*sin(t(2,3)-d(2)+d(3));
+% Jacobian
+J(1,1)=V(2)*V(1)*Y(2,1)*sin(t(2,1)-d(2)+d(1))+...
+V(2)*V(3)*Y(2,3)*sin(t(2,3)-d(2)+d(3));
+J(1,2)=-V(2)*V(3)*Y(2,3)*sin(t(2,3)-d(2)+d(3));
+J(1,3)=V(1)*Y(2,1)*cos(t(2,1)-d(2)+d(1))+2*V(2)*Y(2,2)*cos(t(2,2))+...
+V(3)*Y(2,3)*cos(t(2,3)-d(2)+d(3));
+J(2,1)=-V(3)*V(2)*Y(3,2)*sin(t(3,2)-d(3)+d(2));
+J(2,2)=V(3)*V(1)*Y(3,1)*sin(t(3,1)-d(3)+d(1))+...
+V(3)*V(2)*Y(3,2)*sin(t(3,2)-d(3)+d(2));
+J(2,3)=V(3)*Y(2,3)*cos(t(3,2)-d(3)+d(2));
+J(3,1)=V(2)*V(1)*Y(2,1)*cos(t(2,1)-d(2)+d(1))+...
+
+28
+V(2)*V(3)*Y(2,3)*cos(t(2,3)-d(2)+d(3));
+J(3,2)=-V(2)*V(3)*Y(2,3)*cos(t(2,3)-d(2)+d(3));
+J(3,3)=-V(1)*Y(2,1)*sin(t(2,1)-d(2)+d(1))-2*V(2)*Y(2,2)*sin(t(2,2))-...
+V(3)*Y(2,3)*sin(t(2,3)-d(2)+d(3));
+% Power Residual
+DP = Ps - P;
+DQ = Qs - Q;
+DC = [DP; DQ]
+J
+DX = inv(J)*DC;
+%% Unknown quantities
+d(2) =d(2)+DX(1);
+d(3)=d(3) +DX(2);
+V(2)= V(2)+DX(3);
+V, d, delta =180/pi*d;
+end
+%% Unknown quantities
+P1= V(1)^2*Y(1,1)*cos(t(1,1))+V(1)*V(2)*Y(1,2)*cos(t(1,2)-d(1)+d(2))+...
+V(1)*V(3)*Y(1,3)*cos(t(1,3)-d(1)+d(3))
+Q1=-V(1)^2*Y(1,1)*sin(t(1,1))-V(1)*V(2)*Y(1,2)*sin(t(1,2)-d(1)+d(2))-...
+V(1)*V(3)*Y(1,3)*sin(t(1,3)-d(1)+d(3))
+Q3=-V(3)*V(1)*Y(3,1)*sin(t(3,1)-d(3)+d(1))-V(3)*V(2)*Y(3,2)*...
+sin(t(3,2)-d(3)+d(2))-V(3)^2*Y(3,3)*sin(t(3,3))
